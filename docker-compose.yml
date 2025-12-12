@@ -1,0 +1,18 @@
+services:
+  yt-converter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yt-converter
+    ports:
+      - "3000:3000"
+    volumes:
+      # Persist downloads temporarily (optional)
+      - downloads_data:/app/downloads
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+
+volumes:
+  downloads_data:
+
