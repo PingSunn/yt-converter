@@ -35,15 +35,29 @@ export async function GET(
     }
   }, 60000) // Delete after 1 minute
 
-  // Determine content type
+  // Determine content type with strict MIME type checking
   const ext = path.extname(fileName).toLowerCase()
-  const contentType = ext === '.mp3' ? 'audio/mpeg' : ext === '.wav' ? 'audio/wav' : 'application/octet-stream'
+  let contentType: string
+  
+  if (ext === '.mp3') {
+    contentType = 'audio/mpeg'
+  } else if (ext === '.wav') {
+    contentType = 'audio/wav'
+  } else {
+    // Fallback to octet-stream for unknown types
+    contentType = 'application/octet-stream'
+  }
 
+  // Return response with proper MIME type headers
   return new NextResponse(fileBuffer, {
     headers: {
       'Content-Type': contentType,
       'Content-Disposition': `attachment; filename="${fileName}"`,
       'Content-Length': fileBuffer.length.toString(),
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'X-Content-Type-Options': 'nosniff', // Prevent MIME type sniffing
     },
   })
 }
